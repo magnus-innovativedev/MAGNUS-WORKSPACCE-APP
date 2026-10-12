@@ -27,7 +27,7 @@
 
   let sharedLinks = [];
   let sharedFolders = [];
-  let folders = loadFolders();
+  let folders = [];
 
   // ---------- helpers ----------
   function say(message, ok = false) {
@@ -107,6 +107,8 @@
     return out;
   }
 
+  folders = loadFolders();
+
   // ---------- storage (this device only) ----------
   function loadFolders() {
     try {
@@ -118,7 +120,9 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
         return migrated;
       }
-    } catch { /* fall through */ }
+    } catch {
+      say("Could not load saved folders from this browser. Check browser storage settings.");
+    }
     return [];
   }
 
