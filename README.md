@@ -38,7 +38,7 @@ To create another shared folder, add another entry to `"folders"` with its name 
 Visitors can browse, search, and open the listed links. Link editing, sign-in, and user administration are intentionally not available in this database-free static version.
 
 The shared folders and their links are read-only in the app; edit `public/links.json` and redeploy to publish changes.
-Links to common form services, or links whose title or path identifies them as a form, include a **Copy link** button.
+Links on Google domains (including Google Drive, Docs, Sheets, and Forms), links to common form services, or links whose title or path identifies them as a form include a **Copy link** button.
 
 ## Local development
 

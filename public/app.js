@@ -53,6 +53,14 @@
 
   const same = (a, b) => a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 
+  function isGoogleLink(url) {
+    const hostname = url.hostname.toLocaleLowerCase();
+    return /(^|\.)google\.(?:[a-z]{2,3}|[a-z]{2,3}\.[a-z]{2})$/.test(hostname)
+      || ["g.co", "forms.gle", "goo.gl", "googleusercontent.com"].some(
+        (host) => hostname === host || hostname.endsWith(`.${host}`)
+      );
+  }
+
   function isFormLink(link, url) {
     const formHosts = [
       "forms.gle",
@@ -171,12 +179,12 @@
     info.append(title, address);
     el.append(favicon, info);
 
-    if (isFormLink(link, url)) {
+    if (isGoogleLink(url) || isFormLink(link, url)) {
       const copy = document.createElement("button");
       copy.type = "button";
       copy.className = "copy-link";
       copy.textContent = "Copy link";
-      copy.setAttribute("aria-label", `Copy form link for ${link.title}`);
+      copy.setAttribute("aria-label", `Copy link for ${link.title}`);
       let resetCopyButton;
       copy.addEventListener("click", async () => {
         try {
@@ -184,15 +192,15 @@
           clearTimeout(resetCopyButton);
           copy.textContent = "✓";
           copy.classList.add("copied");
-          copy.setAttribute("aria-label", `Form link copied for ${link.title}`);
+          copy.setAttribute("aria-label", `Link copied for ${link.title}`);
           resetCopyButton = setTimeout(() => {
             copy.textContent = "Copy link";
             copy.classList.remove("copied");
-            copy.setAttribute("aria-label", `Copy form link for ${link.title}`);
+            copy.setAttribute("aria-label", `Copy link for ${link.title}`);
           }, 2000);
-          say("Form link copied.", true);
+          say("Link copied.", true);
         } catch {
-          say("Could not copy the form link. Check browser clipboard permissions.");
+          say("Could not copy the link. Check browser clipboard permissions.");
         }
       });
       el.append(copy);
