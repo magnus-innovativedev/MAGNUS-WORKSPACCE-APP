@@ -1,0 +1,14 @@
+{
+  "name": "magnus-company-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static read-only company application directory for Vercel",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/validate-links.js",
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}

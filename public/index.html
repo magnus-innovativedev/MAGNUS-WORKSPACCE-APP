@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#337ab7">
+  <meta name="description" content="MAGNUS company applications workspace">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MAGNUS">
+  <title>MAGNUS — Company Workspace</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand" aria-label="MAGNUS company workspace">
+        <span class="brand-name">MAGNUS</span>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-product">Company Workspace</span>
+      </div>
+      <button id="install-btn" class="btn" type="button" hidden>Install app</button>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">MAGNUS • WORKSPACE</p>
+      <h1 id="page-title">Your company apps.<br>All in one place.</h1>
+      <p class="subtitle">Open the company applications, and organise your own links in folders.</p>
+      <p id="install-hint" class="hint" hidden>To install on iPhone or iPad: tap Share, then “Add to Home Screen”.</p>
+    </section>
+
+    <p id="notice" class="notice" role="status" aria-live="polite"></p>
+
+    <!-- HOME: folder list -->
+    <section id="home-view" class="library" aria-labelledby="folders-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="folders-title">Folders</h2>
+          <p id="folder-count" class="link-count">Loading…</p>
+        </div>
+        <div class="actions">
+          <input id="search" class="search" type="search" aria-label="Search all links" placeholder="Search all links">
+        </div>
+      </div>
+
+      <form id="folder-form" class="add-form folder-form" autocomplete="off">
+        <input id="new-folder" class="field" type="text" maxlength="60" placeholder="New folder name (e.g. Sales Sheets)" aria-label="New folder name" required>
+        <button class="btn" type="submit">Create folder</button>
+      </form>
+
+      <div id="folder-grid" class="grid" aria-live="polite"></div>
+      <div id="search-grid" class="grid" aria-live="polite" hidden></div>
+
+      <div class="backup">
+        <button id="export-btn" class="btn ghost" type="button">Export my folders</button>
+        <button id="import-btn" class="btn ghost" type="button">Import</button>
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
+      </div>
+      <p class="hint">Your own folders and links are private and stored only on this device and browser. Use Export and Import to copy them to another device.</p>
+    </section>
+
+    <!-- FOLDER: links inside one folder -->
+    <section id="folder-view" class="library" aria-labelledby="folder-title" hidden>
+      <button id="back-btn" class="btn ghost back" type="button">← All folders</button>
+      <div class="section-heading">
+        <div>
+          <h2 id="folder-title">Folder</h2>
+          <p id="link-count" class="link-count"></p>
+        </div>
+        <div id="folder-actions" class="actions">
+          <button id="rename-btn" class="btn ghost" type="button">Rename</button>
+          <button id="delete-folder-btn" class="btn ghost danger" type="button">Delete folder</button>
+        </div>
+      </div>
+
+      <form id="add-form" class="add-form" autocomplete="off">
+        <input id="new-title" class="field" type="text" maxlength="120" placeholder="Name (e.g. Sales Sheet)" aria-label="Link name" required>
+        <input id="new-url" class="field" type="text" inputmode="url" placeholder="Paste link (Google Sheet, etc.)" aria-label="Link address" required>
+        <button class="btn" type="submit">Add link</button>
+      </form>
+
+      <div id="link-grid" class="grid" aria-live="polite"></div>
+    </section>
+
+    <footer>Edit the shared MAGNUS folder in public/links.json and redeploy to publish changes.</footer>
+  </main>
+</body>
+</html>
