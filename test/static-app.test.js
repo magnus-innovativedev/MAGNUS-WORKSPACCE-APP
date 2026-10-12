@@ -49,4 +49,14 @@ test("serves the read-only app and its links without a database", async (t) => {
   const stylesheet = await get("/styles.css");
   assert.equal(stylesheet.status, 200);
   assert.match(stylesheet.headers["content-type"], /css/);
+
+  const logo = await get("/magnus-logo.png");
+  assert.equal(logo.status, 200);
+  assert.match(logo.headers["content-type"], /image\/png/);
+  assert.ok(logo.body.length > 0);
+
+  const manifest = await get("/manifest.webmanifest");
+  assert.equal(manifest.status, 200);
+  assert.match(manifest.headers["content-type"], /application\/manifest\+json/);
+  assert.equal(JSON.parse(manifest.body).icons[0].src, "/icon-192.png");
 });
