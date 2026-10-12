@@ -26,6 +26,7 @@
   const installHint = $("#install-hint");
 
   let sharedLinks = [];
+  let sharedFolders = [];
   let folders = loadFolders();
 
   // ---------- helpers ----------
@@ -107,6 +108,12 @@
   function currentFolder() {
     const hash = location.hash;
     if (hash === "#/magnus") return { id: MAGNUS_ID, name: "MAGNUS", links: sharedLinks, locked: true };
+    const sharedMatch = /^#\/magnus\/f\/(.+)$/.exec(hash);
+    const sharedName = hash === "#/magnus/registration"
+      ? "REGISTARTION"
+      : sharedMatch ? decodeURIComponent(sharedMatch[1]) : "";
+    const sharedFolder = sharedFolders.find((folder) => same(folder.name, sharedName));
+    if (sharedFolder) return { ...sharedFolder, id: `shared:${sharedFolder.name}`, locked: true, nested: true };
     const match = /^#\/f\/(.+)$/.exec(hash);
     if (match) return folders.find((f) => f.id === decodeURIComponent(match[1])) || null;
     return null;
@@ -172,13 +179,18 @@
     info.className = "card-info";
     const open = document.createElement("a");
     open.className = "card-title";
-    open.href = folder.locked ? "#/magnus" : `#/f/${encodeURIComponent(folder.id)}`;
+    open.href = folder.route || (folder.locked ? "#/magnus" : `#/f/${encodeURIComponent(folder.id)}`);
     open.textContent = folder.name;
     const meta = document.createElement("a");
     meta.className = "card-url";
     meta.href = open.href;
-    const n = folder.links.length;
-    meta.textContent = `${n} ${n === 1 ? "link" : "links"}${folder.locked ? " · shared with everyone" : ""}`;
+    let n = folder.links.length;
+    let detail = `${n} ${n === 1 ? "link" : "links"}`;
+    if (folder.id === MAGNUS_ID) {
+      n += sharedFolders.reduce((count, sharedFolder) => count + sharedFolder.links.length, 0);
+      detail = `${n} ${n === 1 ? "link" : "links"} · ${sharedFolders.length} ${sharedFolders.length === 1 ? "folder" : "folders"}`;
+    }
+    meta.textContent = `${detail}${folder.locked ? " · shared with everyone" : ""}`;
     info.append(open, meta);
     el.append(icon, info);
     return el;
@@ -219,16 +231,45 @@
         }
       }
     }
+    for (const folder of sharedFolders) {
+      for (const link of folder.links) {
+        if (`${link.title} ${link.url} MAGNUS ${folder.name}`.toLocaleLowerCase().includes(q)) {
+          searchGrid.append(linkCard(link, folder, true));
+          found += 1;
+        }
+      }
+    }
     if (!found) empty(searchGrid, "No matching links", "Try another search.");
   }
 
   function renderFolder(folder) {
     folderTitle.textContent = folder.name;
     const n = folder.links.length;
-    linkCount.textContent = `${n} ${n === 1 ? "link" : "links"}${folder.locked ? " · shared, read-only" : ""}`;
+    if (folder.id === MAGNUS_ID) {
+      const totalLinks = n + sharedFolders.reduce((count, sharedFolder) => count + sharedFolder.links.length, 0);
+      linkCount.textContent = `${totalLinks} ${totalLinks === 1 ? "link" : "links"} · ${sharedFolders.length} ${sharedFolders.length === 1 ? "folder" : "folders"} · shared, read-only`;
+    } else {
+      linkCount.textContent = `${n} ${n === 1 ? "link" : "links"}${folder.locked ? " · shared, read-only" : ""}`;
+    }
     folderActions.hidden = !!folder.locked;
     addForm.hidden = !!folder.locked;
+    $("#back-btn").textContent = folder.nested ? "← MAGNUS" : "← All folders";
     linkGrid.replaceChildren();
+    if (folder.id === MAGNUS_ID) {
+      for (const sharedFolder of sharedFolders) {
+        linkGrid.append(folderCard({
+          ...sharedFolder,
+          id: `shared:${sharedFolder.name}`,
+          locked: true,
+          route: `#/magnus/f/${encodeURIComponent(sharedFolder.name)}`
+        }));
+      }
+      for (const link of folder.links) linkGrid.append(linkCard(link, folder, false));
+      if (sharedFolders.length === 0 && folder.links.length === 0) {
+        empty(linkGrid, "This folder is empty", "Add shared folders or links in public/links.json and redeploy.");
+      }
+      return;
+    }
     if (!n) {
       empty(linkGrid, "This folder is empty",
         folder.locked ? "Update public/links.json and redeploy to add applications." : "Use the form above to add a Google Sheet or any other link.");
@@ -240,9 +281,10 @@
   function render() {
     const hash = location.hash;
     const folder = currentFolder();
-    if (hash && hash !== "#" && !folder && (hash === "#/magnus" || hash.startsWith("#/f/"))) {
+    if (hash && hash !== "#" && !folder && (hash.startsWith("#/magnus/") || hash.startsWith("#/f/"))) {
       // unknown folder (e.g. deleted, or other device)
-      if (hash.startsWith("#/f/")) { goHome(); return; }
+      location.hash = hash.startsWith("#/magnus/") ? "#/magnus" : "";
+      return;
     }
     if (folder) {
       homeView.hidden = true;
@@ -257,7 +299,9 @@
 
   window.addEventListener("hashchange", () => { say(""); render(); window.scrollTo(0, 0); });
   search.addEventListener("input", render);
-  $("#back-btn").addEventListener("click", goHome);
+  $("#back-btn").addEventListener("click", () => {
+    location.hash = currentFolder() && currentFolder().nested ? "#/magnus" : "";
+  });
 
   // ---------- folder actions ----------
   function folderNameError(name, ignoreId) {
@@ -397,14 +441,28 @@
       return response.json();
     })
     .then((data) => {
-      if (!Array.isArray(data)) throw new Error("The application link list has an invalid format.");
-      for (const link of data) {
+      if (Array.isArray(data)) {
+        sharedLinks = data.slice(1, -1);
+        sharedFolders = data.length
+          ? [{ name: "REGISTARTION", links: data.length > 1 ? [data[0], data[data.length - 1]] : data }]
+          : [];
+      } else if (data && typeof data === "object" && Array.isArray(data.links) && Array.isArray(data.folders)) {
+        sharedLinks = data.links;
+        sharedFolders = data.folders;
+      } else {
+        throw new Error("The application link list has an invalid format.");
+      }
+      for (const link of [...sharedLinks, ...sharedFolders.flatMap((folder) => {
+        if (!folder || typeof folder.name !== "string" || !Array.isArray(folder.links)) {
+          throw new Error("The application link list has an invalid format.");
+        }
+        return folder.links;
+      })]) {
         if (!link || typeof link.title !== "string" || typeof link.url !== "string") {
           throw new Error("The application link list has an invalid format.");
         }
         parseUrl(link.url);
       }
-      sharedLinks = data;
       render();
     })
     .catch((error) => {

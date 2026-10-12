@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const http = require("node:http");
-const { validateLinks } = require("../scripts/validate-links");
+const { validateLinks, validateWorkspace } = require("../scripts/validate-links");
 const { createServer } = require("../server");
 
 test("validates project links and rejects unsafe destinations", () => {
@@ -13,6 +13,27 @@ test("validates project links and rejects unsafe destinations", () => {
     title: "one",
     url: "https://other.example"
   }]), /duplicates/);
+});
+
+test("validates shared folders and links", () => {
+  const workspace = {
+    links: [{ title: "Main app", url: "https://example.com" }],
+    folders: [{ name: "REGISTARTION", links: [{ title: "Form", url: "https://forms.example.com" }] }]
+  };
+  assert.equal(validateWorkspace(workspace), workspace);
+  assert.equal(validateWorkspace({ links: [], folders: [{ name: "Empty", links: [] }] }).folders.length, 1);
+  assert.throws(() => validateWorkspace({
+    links: [],
+    folders: [{ name: "One", links: [] }, { name: "one", links: [] }]
+  }), /reserved or duplicate/);
+  assert.throws(() => validateWorkspace({
+    links: [{ title: "Same", url: "https://example.com" }],
+    folders: [{ name: "Other", links: [{ title: "same", url: "https://other.example" }] }]
+  }), /duplicates/);
+  assert.throws(() => validateWorkspace({
+    links: [],
+    folders: [{ name: "Bad", links: [{ title: "Unsafe", url: "javascript:alert(1)" }] }]
+  }), /HTTP or HTTPS/);
 });
 
 test("serves the read-only app and its links without a database", async (t) => {
@@ -40,12 +61,19 @@ test("serves the read-only app and its links without a database", async (t) => {
   const response = await get("/links.json");
   assert.equal(response.status, 200);
   assert.match(response.headers["content-type"], /application\/json/);
-  assert.equal(JSON.parse(response.body).length, 4);
+  const workspace = JSON.parse(response.body);
+  assert.equal(workspace.links.length, 3);
+  assert.equal(workspace.folders[0].name, "REGISTARTION");
+  assert.equal(workspace.folders[0].links.length, 2);
+  assert.equal(workspace.folders[0].links[0].url, "https://registrationdata.magnusinnovative.com/dashboard");
+  assert.equal(workspace.folders[0].links[1].url, "https://forms.gle/KfuBirtWb5WUi4ZG9");
 
   assert.equal((await get("/api/users")).status, 404);
   const script = await get("/app.js");
   assert.equal(script.status, 200);
   assert.match(script.headers["content-type"], /javascript/);
+  assert.match(script.body, /REGISTARTION/);
+  assert.match(script.body, /#\/magnus\/f\//);
   const stylesheet = await get("/styles.css");
   assert.equal(stylesheet.status, 200);
   assert.match(stylesheet.headers["content-type"], /css/);

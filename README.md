@@ -8,11 +8,36 @@ A static, read-only directory of company application links. It runs on Vercel wi
 2. Keep the project root at the repository root. Vercel uses the included `vercel.json` to run `npm run build` and publish the `public` directory.
 3. Deploy. No database or environment variables are required.
 
-## Change application links
+## Add shared folders and links
 
-Edit [`public/links.json`](./public/links.json), commit the change, and redeploy. The change is shared by everyone visiting the workspace. Each entry must have a unique title and an `http` or `https` URL. The build validates the list before deployment.
+Edit [`public/links.json`](./public/links.json), commit the change, and redeploy. Changes are shared by everyone visiting the workspace. Put links shown directly in **MAGNUS** under `"links"`. Put folders under `"folders"`; each folder has a `"name"` and a `"links"` array. Folder names and link titles must be unique, and links must use `http` or `https`. The build validates the configuration before deployment.
+
+To add a link inside **REGISTARTION**, add an item to that folder's `"links"` array:
+
+```json
+{
+  "title": "New Registration Link",
+  "url": "https://example.com"
+}
+```
+
+To create another shared folder, add another entry to `"folders"` with its name and links. Use an empty array when creating an empty folder:
+
+```json
+{
+  "name": "ANOTHER FOLDER",
+  "links": [
+    {
+      "title": "Example Link",
+      "url": "https://example.com"
+    }
+  ]
+}
+```
 
 Visitors can browse, search, and open the listed links. Link editing, sign-in, and user administration are intentionally not available in this database-free static version.
+
+The shared folders and their links are read-only in the app; edit `public/links.json` and redeploy to publish changes.
 
 ## Local development
 

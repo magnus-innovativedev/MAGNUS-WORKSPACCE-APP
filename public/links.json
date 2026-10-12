@@ -1,22 +1,31 @@
-[
-  {
-    "title": "Magnus Registration Software",
-    "url": "https://registrationdata.magnusinnovative.com/dashboard"
-  },
-  {
-    "title": "Magnus Approval Workflow",
-    "url": "https://student-approval-workflow-system-v7.onrender.com/"
-  },
-  {
-    "title": "Magnus ERP",
-    "url": "https://magnus.magnuserp.net/login"
-  },
-  {
-    "title": "Rm Daily Report",
-    "url": "https://report-automation-wjdn.onrender.com/"
-  },
-  {
-    "title": "Registrtion Form",
-    "url": "https://forms.gle/KfuBirtWb5WUi4ZG9"
-  }
-]
+{
+  "links": [
+    {
+      "title": "Magnus Approval Workflow",
+      "url": "https://student-approval-workflow-system-v7.onrender.com/"
+    },
+    {
+      "title": "Magnus ERP",
+      "url": "https://magnus.magnuserp.net/login"
+    },
+    {
+      "title": "Rm Daily Report",
+      "url": "https://report-automation-wjdn.onrender.com/"
+    }
+  ],
+  "folders": [
+    {
+      "name": "REGISTARTION",
+      "links": [
+        {
+          "title": "Magnus Registration Software",
+          "url": "https://registrationdata.magnusinnovative.com/dashboard"
+        },
+        {
+          "title": "Registrtion Form",
+          "url": "https://forms.gle/KfuBirtWb5WUi4ZG9"
+        }
+      ]
+    }
+  ]
+}
