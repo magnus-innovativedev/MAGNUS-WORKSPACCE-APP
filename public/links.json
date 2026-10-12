@@ -1,10 +1,10 @@
 [
   {
-    "title": "Registration Data Keeping Webapp",
+    "title": "Magnus Registration app",
     "url": "https://registrationdata.magnusinnovative.com/dashboard"
   },
   {
-    "title": "Approval Workflow Web App",
+    "title": "Magnus Approval Workflow",
     "url": "https://student-approval-workflow-system-v7.onrender.com/"
   },
   {
@@ -12,7 +12,7 @@
     "url": "https://magnus.magnuserp.net/login"
   },
   {
-    "title": "Daily RM Report Webapp",
+    "title": "Rm Daily Report",
     "url": "https://report-automation-wjdn.onrender.com/"
   }
 ]
