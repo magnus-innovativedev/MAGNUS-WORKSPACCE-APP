@@ -177,9 +177,19 @@
       copy.className = "copy-link";
       copy.textContent = "Copy link";
       copy.setAttribute("aria-label", `Copy form link for ${link.title}`);
+      let resetCopyButton;
       copy.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(url.href);
+          clearTimeout(resetCopyButton);
+          copy.textContent = "✓";
+          copy.classList.add("copied");
+          copy.setAttribute("aria-label", `Form link copied for ${link.title}`);
+          resetCopyButton = setTimeout(() => {
+            copy.textContent = "Copy link";
+            copy.classList.remove("copied");
+            copy.setAttribute("aria-label", `Copy form link for ${link.title}`);
+          }, 2000);
           say("Form link copied.", true);
         } catch {
           say("Could not copy the form link. Check browser clipboard permissions.");

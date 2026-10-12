@@ -74,6 +74,7 @@ footer { margin-top: 34px; color: var(--muted); font-size: 12px; text-align: cen
 .remove:hover { background: #fbeeed; }
 .copy-link { flex: 0 0 auto; min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--blue); background: transparent; font-size: 12px; }
 .copy-link:hover { background: var(--soft-blue); }
+.copy-link.copied { color: var(--blue-dark); font-size: 18px; font-weight: 700; }
 
 @media (max-width: 640px) {
   .add-form { grid-template-columns: 1fr; }
