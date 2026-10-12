@@ -53,6 +53,26 @@
 
   const same = (a, b) => a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 
+  function isFormLink(link, url) {
+    const formHosts = [
+      "forms.gle",
+      "docs.google.com",
+      "forms.office.com",
+      "typeform.com",
+      "jotform.com",
+      "surveymonkey.com",
+      "tally.so",
+      "forms.app",
+      "formstack.com",
+      "wufoo.com",
+      "cognitoforms.com",
+      "zoho.com"
+    ];
+    return formHosts.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`))
+      || /(^|\/)(forms?|questionnaires?)(\/|$)/i.test(url.pathname)
+      || /\b(form|questionnaire)\b/i.test(link.title);
+  }
+
   function cleanLinks(data) {
     const out = [];
     if (!Array.isArray(data)) return out;
@@ -150,6 +170,23 @@
     address.title = url.href;
     info.append(title, address);
     el.append(favicon, info);
+
+    if (isFormLink(link, url)) {
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.className = "copy-link";
+      copy.textContent = "Copy link";
+      copy.setAttribute("aria-label", `Copy form link for ${link.title}`);
+      copy.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(url.href);
+          say("Form link copied.", true);
+        } catch {
+          say("Could not copy the form link. Check browser clipboard permissions.");
+        }
+      });
+      el.append(copy);
+    }
 
     if (!folder.locked && !showFolderName) {
       const remove = document.createElement("button");

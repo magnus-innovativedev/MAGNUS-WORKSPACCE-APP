@@ -55,14 +55,15 @@ test("serves the read-only app and its links without a database", async (t) => {
 
   const page = await get("/");
   assert.equal(page.status, 200);
-  assert.match(page.body, /public\/links\.json/);
+  assert.doesNotMatch(page.body, /Edit shared folders and links/);
   assert.doesNotMatch(page.body, /Sign in to MAGNUS/);
 
   const response = await get("/links.json");
   assert.equal(response.status, 200);
   assert.match(response.headers["content-type"], /application\/json/);
   const workspace = JSON.parse(response.body);
-  assert.equal(workspace.links.length, 3);
+  assert.equal(workspace.links.length, 4);
+  assert.equal(workspace.links[3].url, "https://forms.gle/BVH58YmR2oKVRQ3P9");
   assert.equal(workspace.folders[0].name, "REGISTARTION");
   assert.equal(workspace.folders[0].links.length, 2);
   assert.equal(workspace.folders[0].links[0].url, "https://registrationdata.magnusinnovative.com/dashboard");
@@ -74,6 +75,7 @@ test("serves the read-only app and its links without a database", async (t) => {
   assert.match(script.headers["content-type"], /javascript/);
   assert.match(script.body, /REGISTARTION/);
   assert.match(script.body, /#\/magnus\/f\//);
+  assert.match(script.body, /Copy link/);
   const stylesheet = await get("/styles.css");
   assert.equal(stylesheet.status, 200);
   assert.match(stylesheet.headers["content-type"], /css/);
