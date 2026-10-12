@@ -49,4 +49,8 @@ test("serves the read-only app and its links without a database", async (t) => {
   const stylesheet = await get("/styles.css");
   assert.equal(stylesheet.status, 200);
   assert.match(stylesheet.headers["content-type"], /css/);
+  const logo = await get("/logo.svg");
+  assert.equal(logo.status, 200);
+  assert.match(logo.headers["content-type"], /image\/svg\+xml/);
+  assert.match(logo.body, /<svg/);
 });

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title">
+  <title id="title">MAGNUS</title>
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#438fca"/>
+      <stop offset="1" stop-color="#245b8d"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="14" fill="url(#blue)"/>
+  <path d="M10 34V14h4l10 11 10-11h4v20h-5V22l-9 10-9-10v12z" fill="#fff"/>
+  <path d="m36 7 1.6 3.4L41 12l-3.4 1.6L36 17l-1.6-3.4L31 12l3.4-1.6z" fill="#f6c453"/>
+</svg>
